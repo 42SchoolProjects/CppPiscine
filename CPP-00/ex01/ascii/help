@@ -1,0 +1,11 @@
+Availaible Commands
+
+==============================
+
+HOME						-> Go back to the HOME
+ADD   						-> Add a new contact
+SEARCH	        	 	    -> Search for a contact by name
+HELP                        -> Display this help message
+EXIT                        -> Exit the phone book application
+
+==============================
