@@ -38,6 +38,8 @@ BitcoinExchange::BitcoinExchange(const std::string &Filename)
 			std::cerr << "Error: invalid value => " << ValueString << std::endl;
 			continue;
 		}
+
+		Data[Line] = Value;
 	}
 
 	File.close();
