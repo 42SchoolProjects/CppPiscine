@@ -43,12 +43,44 @@ BitcoinExchange::BitcoinExchange(const std::string &Filename)
 	File.close();
 }
 
+static bool IsValidDate(const std::string &Date)
+{
+    if (Date.length() != 10 || Date[4] != '-' || Date[7] != '-')
+	{
+        return false;
+	}
+
+    int Year, Month, Day;
+    std::istringstream IssYear(Date.substr(0, 4));
+    std::istringstream IssMonth(Date.substr(5, 2));
+    std::istringstream IssDay(Date.substr(8, 2));
+    if (!(IssYear >> Year) || !(IssMonth >> Month) || !(IssDay >> Day))
+	{
+        return false;
+	}
+
+    if (Month < 1 || Month > 12)
+	{
+		return false;
+	}
+
+    int DaysInMonth[] = {31, (Year % 4 == 0 && (Year % 100 != 0 || Year % 400 == 0)) ? 29 : 28,
+                         31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    if (Day < 1 || Day > DaysInMonth[Month - 1])
+	{
+        return false;
+	}
+
+    return true;
+}
+
 void BitcoinExchange::ReadAndPrintInput(const std::string &Filename) const
 {
     std::ifstream InputFile(Filename.c_str());
     if (!InputFile.is_open())
     {
-        std::cerr << "Failed to open data.csv file !" << std::endl;
+        std::cerr << "Failed to open " << Filename << " file !" << std::endl;
         std::exit(1);
     }
 
@@ -57,6 +89,11 @@ void BitcoinExchange::ReadAndPrintInput(const std::string &Filename) const
 
     while (std::getline(InputFile, Line))
     {
+		if (Line.empty())
+		{
+			continue;
+		}
+
         if (IsFirstLine)
         {
             IsFirstLine = false;
@@ -71,8 +108,13 @@ void BitcoinExchange::ReadAndPrintInput(const std::string &Filename) const
 		}
 
         std::string Date = Line.substr(0, PipePos);
-		std::string ValueString = Line.substr(PipePos + 3); // " | "
+		if (!IsValidDate(Date))
+		{
+			std::cerr << "Error: invalid date => " << Date << std::endl;
+			continue;
+		}
 
+		std::string ValueString = Line.substr(PipePos + 3); // " | "
 		std::stringstream Converter(ValueString);
 
 		float Value;
@@ -102,7 +144,6 @@ void BitcoinExchange::ReadAndPrintInput(const std::string &Filename) const
         {
 			// Find previous date
             std::map<std::string, float>::const_iterator lb = Data.lower_bound(Date);
-			std::cout << lb->first << std::endl;
             if (lb != Data.begin())
             {
                 --lb;
