@@ -2,7 +2,6 @@
 
 int main(int ac, char **av)
 {
-	(void) av;
 	if (ac != 2)
 	{
 		std::cerr << "Format -> <expression>" << std::endl;
