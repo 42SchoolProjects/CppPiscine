@@ -99,7 +99,7 @@ RPN::RPN(const std::string &Expression)
 
 		while (iss >> token)
 		{
-			if (std::isdigit(token[0]))
+			if (token.length() == 1 && std::isdigit(token[0]))
 			{
 				Stack.push(std::atoi(token.c_str()));
 			}
