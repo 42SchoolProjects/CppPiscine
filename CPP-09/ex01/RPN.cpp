@@ -129,6 +129,10 @@ RPN::RPN(const std::string &Expression)
 			std::cout << "No result to display." << std::endl;
 			return;
 		}
+		if (Stack.size() != 1)
+		{
+			throw InvalidInput();
+		}
 		std::cout << Stack.top() << std::endl;
 	}
 	catch(const std::exception& e)
