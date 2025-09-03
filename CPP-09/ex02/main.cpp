@@ -5,7 +5,7 @@ int main(int ac, char **av)
 	if (ac < 2)
 	{
 		std::cerr << "Error -> " << av[0] << " <numbers...>" << std::endl;
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	std::vector<int> InVec;
@@ -23,7 +23,9 @@ int main(int ac, char **av)
 		else
 		{
 			std::cerr << "Error -> Invalid number: " << av[i] << " is not a valid positive integer." << std::endl;
-			exit(EXIT_FAILURE);
+			InVec.clear();
+			InDeq.clear();
+			return EXIT_FAILURE;
 		}
 	}
 

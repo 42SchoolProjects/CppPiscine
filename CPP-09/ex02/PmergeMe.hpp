@@ -40,6 +40,7 @@ PmergeMe<Container>::PmergeMe(Container &container) : container(container)
 template <typename Container>
 PmergeMe<Container> &PmergeMe<Container>::operator=(const PmergeMe &other)
 {
+	(void) other;
 }
 
 template <typename Container>
