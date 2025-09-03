@@ -7,6 +7,8 @@
 #include <sstream>
 #include <ctime>
 
+// #define DEBUG
+
 template <typename Container>
 class PmergeMe
 {
@@ -92,6 +94,7 @@ void PmergeMe<Container>::FordJohnsonProcess(size_t Start, size_t End)
 		return;
 	}
 
+	// Handle ODD
 	bool HasPending = (Size % 2 != 0);
 	typename PmergeMe<Container>::ValueType Pending;
 	size_t PendingPos = End - 1;
@@ -99,8 +102,13 @@ void PmergeMe<Container>::FordJohnsonProcess(size_t Start, size_t End)
 	if (HasPending)
 	{
 		Pending = this->container[PendingPos];
+		#ifdef DEBUG
+			std::cout << std::endl << "[ DEBUG ] " << "Pending value is -> " << Pending << std::endl;
+		#endif
 		End--;
 	}
+
+	// Pairwise compare and swap
 	for (size_t i = Start; i < End; i += 2)
 	{
 		if (this->container[i] > this->container[i + 1])
@@ -109,31 +117,40 @@ void PmergeMe<Container>::FordJohnsonProcess(size_t Start, size_t End)
 		}
 	}
 
-	std::vector<typename PmergeMe<Container>::ValueType> high, low;
+	std::vector<typename PmergeMe<Container>::ValueType> High, Low;
 
+	// Split into high and low
 	for (size_t i = Start + 1; i < End; i += 2)
 	{
-		high.push_back(this->container[i]);
-		low.push_back(this->container[i - 1]);
+		High.push_back(this->container[i]);
+		Low.push_back(this->container[i - 1]);
 	}
 
-	PmergeMe<std::vector<typename PmergeMe<Container>::ValueType> >(high).Sort();
-	std::vector<size_t> InsertOrder = this->InsertionOrderGenerator(low.size());
+	PmergeMe<std::vector<typename PmergeMe<Container>::ValueType> >(High).Sort(); // Sort high container
+	std::vector<size_t> InsertOrder = this->InsertionOrderGenerator(Low.size());
 
 	for (size_t k = 0; k < InsertOrder.size(); ++k)
 	{
-		size_t idx = InsertOrder[k];
-		typename std::vector<typename PmergeMe<Container>::ValueType>::iterator it = std::lower_bound(high.begin(), high.end(), low[idx]);
-		high.insert(it, low[idx]);
+		size_t Index = InsertOrder[k];
+		typename std::vector<typename PmergeMe<Container>::ValueType>::iterator it = std::lower_bound(High.begin(), High.end(), Low[Index]);
+		#ifdef DEBUG
+			std::cout << "[ DEBUG ] " << *it << " Will be replaced by -> " << Low[Index] << std::endl;
+		#endif
+		High.insert(it, Low[Index]);
 	}
+
 	if (HasPending)
 	{
-		typename std::vector<typename PmergeMe<Container>::ValueType>::iterator it = std::lower_bound(high.begin(), high.end(), Pending);
-		high.insert(it, Pending);
+		typename std::vector<typename PmergeMe<Container>::ValueType>::iterator it = std::lower_bound(High.begin(), High.end(), Pending);
+		#ifdef DEBUG
+			std::cout << "[ DEBUG ] " << *it << " Will be replaced by -> " << Pending << std::endl;
+		#endif
+		High.insert(it, Pending);
 	}
-	for (size_t i = 0; i < high.size(); ++i)
+
+	for (size_t i = 0; i < High.size(); ++i)
 	{
-		this->container[Start + i] = high[i];
+		this->container[Start + i] = High[i];
 	}
 }
 
